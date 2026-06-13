@@ -31,24 +31,24 @@ pub struct FZenPackageSummary {
     pub package_flags: u32,
     pub cooked_header_size: u32,
     pub imported_public_export_hashes_offset: i32,
-    import_map_offset: i32,
-    export_map_offset: i32,
-    export_bundle_entries_offset: i32,
-    graph_data_offset: i32,
-    dependency_bundle_headers_offset: i32,
+    pub import_map_offset: i32,
+    pub export_map_offset: i32,
+    pub export_bundle_entries_offset: i32,
+    pub graph_data_offset: i32,
+    pub dependency_bundle_headers_offset: i32,
     dependency_bundle_entries_offset: i32,
     imported_package_names_offset: i32,
 
     // if EIoContainerHeaderVersion == Initial
-    name_map_names_offset: i32,
-    name_map_names_size: i32,
+    pub name_map_names_offset: i32,
+    pub name_map_names_size: i32,
     name_map_hashes_offset: i32,
-    name_map_hashes_size: i32,
+    pub name_map_hashes_size: i32,
     graph_data_size: i32,
 }
 impl FZenPackageSummary {
     #[instrument(skip_all, name = "FZenPackageSummary")]
-    fn deserialize<S: Read>(s: &mut S, container_header_version: EIoContainerHeaderVersion) -> Result<Self> {
+    pub fn deserialize<S: Read>(s: &mut S, container_header_version: EIoContainerHeaderVersion) -> Result<Self> {
         let mut has_versioning_info: u32 = 0;
         let mut header_size: u32 = 0;
         if container_header_version > EIoContainerHeaderVersion::Initial {

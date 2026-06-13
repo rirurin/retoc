@@ -443,7 +443,7 @@ pub struct Toc {
     pub container_flags: EIoContainerFlags,
 
     // transient indexes
-    directory_index: FIoDirectoryIndexResource,
+    pub directory_index: FIoDirectoryIndexResource,
     pub file_map: HashMap<String, u32>,
     file_map_lower: HashMap<String, u32>,
     file_map_rev: HashMap<u32, String>,
@@ -740,7 +740,7 @@ impl FromStr for FPackageId {
     }
 }
 
-fn lower_utf16_cityhash(s: &str) -> u64 {
+pub fn lower_utf16_cityhash(s: &str) -> u64 {
     let bytes = s.to_ascii_lowercase().encode_utf16().flat_map(u16::to_le_bytes).collect::<Vec<u8>>();
     cityhasher::hash(bytes)
 }
@@ -945,7 +945,7 @@ impl Writeable for FIoOffsetAndLength {
     }
 }
 impl FIoOffsetAndLength {
-    pub(crate) fn new(offset: u64, length: u64) -> Self {
+    pub fn new(offset: u64, length: u64) -> Self {
         let mut new = Self::default();
         new.set_offset(offset);
         new.set_length(length);
@@ -994,7 +994,7 @@ impl Writeable for FIoStoreTocCompressedBlockEntry {
     }
 }
 impl FIoStoreTocCompressedBlockEntry {
-    pub(crate) fn new(offset: u64, compressed_size: u32, uncompressed_size: u32, compression_method_index: u8) -> Self {
+    pub fn new(offset: u64, compressed_size: u32, uncompressed_size: u32, compression_method_index: u8) -> Self {
         let mut new = Self::default();
         new.set_offset(offset);
         new.set_compressed_size(compressed_size);
@@ -1234,7 +1234,7 @@ pub struct FIoStoreTocChunkInfo {
     is_compressed: bool,
 }
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, FromRepr, AsRefStr)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, FromRepr, AsRefStr)]
 #[repr(u8)]
 pub enum EIoChunkType {
     Invalid,
@@ -1351,7 +1351,7 @@ mod directory_index {
 
     #[derive(Debug, Default)]
     pub struct FIoDirectoryIndexResource {
-        pub(crate) mount_point: UEPathBuf,
+        pub mount_point: UEPathBuf,
         directory_entries: Vec<FIoDirectoryIndexEntry>,
         file_entries: Vec<FIoFileIndexEntry>,
         string_table: Vec<String>,

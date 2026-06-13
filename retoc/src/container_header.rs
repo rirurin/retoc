@@ -418,14 +418,60 @@ pub struct StoreEntry {
     pub shader_map_hashes: Vec<FSHAHash>,
 }
 
+impl Readable for StoreEntry {
+    fn de<S: Read>(s: &mut S) -> Result<Self>
+    where
+        Self: Sized,
+    {
+        Ok(Self {
+            export_bundles_size: s.de()?,
+            load_order: s.de()?,
+            export_count: s.de()?,
+            export_bundle_count: s.de()?,
+            imported_packages: s.de()?,
+            shader_map_hashes: s.de()?
+        })
+    }
+}
+
+impl Writeable for StoreEntry {
+    fn ser<S: Write>(&self, s: &mut S) -> Result<()> {
+        s.ser(&self.export_bundles_size)?;
+        s.ser(&self.load_order)?;
+        s.ser(&self.export_count)?;
+        s.ser(&self.export_bundle_count)?;
+        s.ser(&self.imported_packages)?;
+        s.ser(&self.shader_map_hashes)?;
+        Ok(())
+    }
+}
+
 #[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
-struct StoreEntries(BTreeMap<FPackageId, StoreEntry>);
+pub struct StoreEntries(BTreeMap<FPackageId, StoreEntry>);
+
+impl IntoIterator for StoreEntries {
+    type Item = (FPackageId, StoreEntry);
+    type IntoIter = <BTreeMap<FPackageId, StoreEntry> as IntoIterator>::IntoIter;
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.into_iter()
+    }
+}
+
 impl StoreEntries {
-    fn get(&self, package_id: FPackageId) -> Option<StoreEntry> {
+    pub fn get(&self, package_id: FPackageId) -> Option<StoreEntry> {
         self.0.get(&package_id).cloned()
     }
+
+    pub fn contains(&self, package_id: FPackageId) -> bool {
+        self.0.get(&package_id).is_some()
+    }
+
+    pub fn insert(&mut self, package_id: FPackageId, entry: StoreEntry) {
+        self.0.insert(package_id, entry);
+    }
+
     #[instrument(skip_all, name = "StoreEntries")]
-    fn deserialize<S: Read>(s: &mut S, version: EIoContainerHeaderVersion) -> Result<Self> {
+    pub fn deserialize<S: Read>(s: &mut S, version: EIoContainerHeaderVersion) -> Result<Self> {
         let package_ids: Vec<FPackageId> = s.de()?;
 
         let buffer: Vec<u8> = s.de()?;
@@ -487,7 +533,7 @@ impl StoreEntries {
         Ok(Self(BTreeMap::from_iter(package_ids.into_iter().zip(entries.into_iter()))))
     }
     #[instrument(skip_all, name = "StoreEntries")]
-    fn serialize<S: Write>(&self, s: &mut S, version: EIoContainerHeaderVersion) -> Result<()> {
+    pub fn serialize<S: Write>(&self, s: &mut S, version: EIoContainerHeaderVersion) -> Result<()> {
         s.ser(&(self.0.len() as u32))?;
         for package_id in self.0.keys() {
             s.ser(package_id)?;
