@@ -728,7 +728,7 @@ impl Display for FPackageId {
     }
 }
 impl FPackageId {
-    fn from_name(name: &str) -> Self {
+    pub fn from_name(name: &str) -> Self {
         Self(lower_utf16_cityhash(name))
     }
 }

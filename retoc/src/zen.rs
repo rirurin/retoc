@@ -36,15 +36,15 @@ pub struct FZenPackageSummary {
     pub export_bundle_entries_offset: i32,
     pub graph_data_offset: i32,
     pub dependency_bundle_headers_offset: i32,
-    dependency_bundle_entries_offset: i32,
-    imported_package_names_offset: i32,
+    pub dependency_bundle_entries_offset: i32,
+    pub imported_package_names_offset: i32,
 
     // if EIoContainerHeaderVersion == Initial
     pub name_map_names_offset: i32,
     pub name_map_names_size: i32,
-    name_map_hashes_offset: i32,
+    pub name_map_hashes_offset: i32,
     pub name_map_hashes_size: i32,
-    graph_data_size: i32,
+    pub graph_data_size: i32,
 }
 impl FZenPackageSummary {
     #[instrument(skip_all, name = "FZenPackageSummary")]
@@ -771,8 +771,8 @@ pub enum EUnrealEngineObjectUE4Version {
 }
 
 #[derive(Debug, Clone, Default)]
-struct FZenPackageImportedPackageNamesContainer {
-    imported_package_names: Vec<String>,
+pub struct FZenPackageImportedPackageNamesContainer {
+    pub imported_package_names: Vec<String>,
 }
 impl Readable for FZenPackageImportedPackageNamesContainer {
     #[instrument(skip_all, name = "FZenPackageImportedPackageNamesContainer")]
