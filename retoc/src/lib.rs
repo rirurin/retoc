@@ -446,8 +446,8 @@ pub struct Toc {
     pub directory_index: FIoDirectoryIndexResource,
     pub file_map: HashMap<String, u32>,
     file_map_lower: HashMap<String, u32>,
-    file_map_rev: HashMap<u32, String>,
-    chunk_id_map: HashMap<FIoChunkId, u32>,
+    pub file_map_rev: HashMap<u32, String>,
+    pub chunk_id_map: HashMap<FIoChunkId, u32>,
 }
 #[allow(unused)]
 pub struct TocSignatures {
